@@ -223,11 +223,6 @@ export function PortfolioMappingPage() {
       throw new Error("No valid column headers found in CSV file");
     }
 
-    console.log(
-      `Found ${cleanHeaders.length} columns in ${lines.length} lines (${lines.length - 1} data rows)`
-    );
-    console.log("Headers:", cleanHeaders);
-
     return cleanHeaders;
   };
 
@@ -296,7 +291,6 @@ export function PortfolioMappingPage() {
       (mapped.includes("house_number") || mapped.includes("name")) &&
         mapped.includes("city") &&
         hasCountry,
-      mapped.includes("street") && mapped.includes("city") && hasCountry,
       mapped.includes("latitude") && mapped.includes("longitude"),
     ].some((combo) => combo);
   };
@@ -451,8 +445,6 @@ export function PortfolioMappingPage() {
                 • <strong>formatted_address</strong> + <strong>country</strong>{" "}
                 (or country_code)
                 <br />• <strong>address_line</strong> + <strong>city</strong> +{" "}
-                <strong>country</strong> (or country_code)
-                <br />• <strong>street</strong> + <strong>city</strong> +{" "}
                 <strong>country</strong> (or country_code)
                 <br />• <strong>house_number</strong> (or name) +{" "}
                 <strong>city</strong> + <strong>country</strong> (or
