@@ -1,0 +1,120 @@
+.
+├── eslint.config.js
+├── index.html
+├── node_modules
+│   ├── @chromatic-com
+│   │   └── storybook -> ../.pnpm/@chromatic-com+storybook@3.2.6_react@19.1.0_storybook@8.6.14_prettier@3.5.3_/node_modules/@chromatic-com/storybook
+│   ├── @eslint
+│   │   └── js -> ../.pnpm/@eslint+js@9.27.0/node_modules/@eslint/js
+│   ├── @mantine
+│   │   ├── core -> ../.pnpm/@mantine+core@8.0.1_@mantine+hooks@8.0.1_react@19.1.0__@types+react@19.1.4_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/@mantine/core
+│   │   └── hooks -> ../.pnpm/@mantine+hooks@8.0.1_react@19.1.0/node_modules/@mantine/hooks
+│   ├── @storybook
+│   │   ├── addon-actions -> ../.pnpm/@storybook+addon-actions@8.6.14_storybook@8.6.14_prettier@3.5.3_/node_modules/@storybook/addon-actions
+│   │   ├── addon-essentials -> ../.pnpm/@storybook+addon-essentials@8.6.14_@types+react@19.1.4_storybook@8.6.14_prettier@3.5.3_/node_modules/@storybook/addon-essentials
+│   │   ├── addon-interactions -> ../.pnpm/@storybook+addon-interactions@8.6.14_storybook@8.6.14_prettier@3.5.3_/node_modules/@storybook/addon-interactions
+│   │   ├── addon-links -> ../.pnpm/@storybook+addon-links@8.6.14_react@19.1.0_storybook@8.6.14_prettier@3.5.3_/node_modules/@storybook/addon-links
+│   │   ├── blocks -> ../.pnpm/@storybook+blocks@8.6.14_react-dom@19.1.0_react@19.1.0__react@19.1.0_storybook@8.6.14_prettier@3.5.3_/node_modules/@storybook/blocks
+│   │   ├── react -> ../.pnpm/@storybook+react@8.6.14_@storybook+test@8.6.14_storybook@8.6.14_prettier@3.5.3___react-_005f1cc120c2d97b2ce01f275d699295/node_modules/@storybook/react
+│   │   ├── react-vite -> ../.pnpm/@storybook+react-vite@8.6.14_@storybook+test@8.6.14_storybook@8.6.14_prettier@3.5.3___r_bb2c74cad0d38c406df9427a6aa2f710/node_modules/@storybook/react-vite
+│   │   └── test -> ../.pnpm/@storybook+test@8.6.14_storybook@8.6.14_prettier@3.5.3_/node_modules/@storybook/test
+│   ├── @tabler
+│   │   └── icons-react -> ../.pnpm/@tabler+icons-react@3.33.0_react@19.1.0/node_modules/@tabler/icons-react
+│   ├── @tanstack
+│   │   ├── eslint-plugin-query -> ../.pnpm/@tanstack+eslint-plugin-query@5.74.7_eslint@9.27.0_typescript@5.8.3/node_modules/@tanstack/eslint-plugin-query
+│   │   ├── react-query -> ../.pnpm/@tanstack+react-query@5.76.1_react@19.1.0/node_modules/@tanstack/react-query
+│   │   └── react-query-devtools -> ../.pnpm/@tanstack+react-query-devtools@5.76.1_@tanstack+react-query@5.76.1_react@19.1.0__react@19.1.0/node_modules/@tanstack/react-query-devtools
+│   ├── @testing-library
+│   │   ├── dom -> ../.pnpm/@testing-library+dom@10.4.0/node_modules/@testing-library/dom
+│   │   ├── jest-dom -> ../.pnpm/@testing-library+jest-dom@6.6.3/node_modules/@testing-library/jest-dom
+│   │   ├── react -> ../.pnpm/@testing-library+react@16.3.0_@testing-library+dom@10.4.0_@types+react-dom@19.1.5_@type_13678f14edb207b811efad2d1cd9d44e/node_modules/@testing-library/react
+│   │   └── user-event -> ../.pnpm/@testing-library+user-event@14.6.1_@testing-library+dom@10.4.0/node_modules/@testing-library/user-event
+│   ├── @types
+│   │   ├── node -> ../.pnpm/@types+node@22.15.18/node_modules/@types/node
+│   │   ├── papaparse -> ../.pnpm/@types+papaparse@5.3.16/node_modules/@types/papaparse
+│   │   ├── react -> ../.pnpm/@types+react@19.1.4/node_modules/@types/react
+│   │   └── react-dom -> ../.pnpm/@types+react-dom@19.1.5_@types+react@19.1.4/node_modules/@types/react-dom
+│   ├── @vitejs
+│   │   └── plugin-react -> ../.pnpm/@vitejs+plugin-react@4.4.1_vite@6.3.5_@types+node@22.15.18_sugarss@4.0.1_postcss@8.5.3__/node_modules/@vitejs/plugin-react
+│   ├── clsx -> .pnpm/clsx@2.1.1/node_modules/clsx
+│   ├── eslint -> .pnpm/eslint@9.27.0/node_modules/eslint
+│   ├── eslint-config-mantine -> .pnpm/eslint-config-mantine@4.0.3_@eslint+js@9.27.0_eslint-plugin-jsx-a11y@6.10.2_eslint@9.27_7b458830e0f1d84be956c6e9f160b5ca/node_modules/eslint-config-mantine
+│   ├── eslint-plugin-jsx-a11y -> .pnpm/eslint-plugin-jsx-a11y@6.10.2_eslint@9.27.0/node_modules/eslint-plugin-jsx-a11y
+│   ├── eslint-plugin-react -> .pnpm/eslint-plugin-react@7.37.5_eslint@9.27.0/node_modules/eslint-plugin-react
+│   ├── eslint-plugin-react-hooks -> .pnpm/eslint-plugin-react-hooks@5.2.0_eslint@9.27.0/node_modules/eslint-plugin-react-hooks
+│   ├── eslint-plugin-react-refresh -> .pnpm/eslint-plugin-react-refresh@0.4.20_eslint@9.27.0/node_modules/eslint-plugin-react-refresh
+│   ├── eslint-plugin-storybook -> .pnpm/eslint-plugin-storybook@0.12.0_eslint@9.27.0_typescript@5.8.3/node_modules/eslint-plugin-storybook
+│   ├── globals -> .pnpm/globals@16.1.0/node_modules/globals
+│   ├── i18next -> .pnpm/i18next@25.1.3_typescript@5.8.3/node_modules/i18next
+│   ├── i18next-browser-languagedetector -> .pnpm/i18next-browser-languagedetector@8.1.0/node_modules/i18next-browser-languagedetector
+│   ├── i18next-http-backend -> .pnpm/i18next-http-backend@3.0.2/node_modules/i18next-http-backend
+│   ├── jsdom -> .pnpm/jsdom@26.1.0/node_modules/jsdom
+│   ├── ky -> .pnpm/ky@1.8.1/node_modules/ky
+│   ├── mantine-datatable -> .pnpm/mantine-datatable@7.17.1_@mantine+core@8.0.1_@mantine+hooks@8.0.1_react@19.1.0__@types+_d59064282b5f9c8f970eb2f5560e9416/node_modules/mantine-datatable
+│   ├── openapi-typescript -> .pnpm/openapi-typescript@7.8.0_typescript@5.8.3/node_modules/openapi-typescript
+│   ├── papaparse -> .pnpm/papaparse@5.5.2/node_modules/papaparse
+│   ├── postcss -> .pnpm/postcss@8.5.3/node_modules/postcss
+│   ├── postcss-preset-mantine -> .pnpm/postcss-preset-mantine@1.17.0_postcss@8.5.3/node_modules/postcss-preset-mantine
+│   ├── postcss-simple-vars -> .pnpm/postcss-simple-vars@7.0.1_postcss@8.5.3/node_modules/postcss-simple-vars
+│   ├── prettier -> .pnpm/prettier@3.5.3/node_modules/prettier
+│   ├── react -> .pnpm/react@19.1.0/node_modules/react
+│   ├── react-dom -> .pnpm/react-dom@19.1.0_react@19.1.0/node_modules/react-dom
+│   ├── react-i18next -> .pnpm/react-i18next@15.5.1_i18next@25.1.3_typescript@5.8.3__react-dom@19.1.0_react@19.1.0__react@19.1.0_typescript@5.8.3/node_modules/react-i18next
+│   ├── react-router -> .pnpm/react-router@7.6.0_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/react-router
+│   ├── react-router-dom -> .pnpm/react-router-dom@7.6.0_react-dom@19.1.0_react@19.1.0__react@19.1.0/node_modules/react-router-dom
+│   ├── storybook -> .pnpm/storybook@8.6.14_prettier@3.5.3/node_modules/storybook
+│   ├── storybook-dark-mode -> .pnpm/storybook-dark-mode@4.0.2_react-dom@19.1.0_react@19.1.0__react@19.1.0_storybook@8.6.14_prettier@3.5.3_/node_modules/storybook-dark-mode
+│   ├── stylelint -> .pnpm/stylelint@16.19.1_typescript@5.8.3/node_modules/stylelint
+│   ├── stylelint-config-standard-scss -> .pnpm/stylelint-config-standard-scss@15.0.1_postcss@8.5.3_stylelint@16.19.1_typescript@5.8.3_/node_modules/stylelint-config-standard-scss
+│   ├── typescript -> .pnpm/typescript@5.8.3/node_modules/typescript
+│   ├── typescript-eslint -> .pnpm/typescript-eslint@8.32.1_eslint@9.27.0_typescript@5.8.3/node_modules/typescript-eslint
+│   ├── vite -> .pnpm/vite@6.3.5_@types+node@22.15.18_sugarss@4.0.1_postcss@8.5.3_/node_modules/vite
+│   ├── vite-tsconfig-paths -> .pnpm/vite-tsconfig-paths@5.1.4_typescript@5.8.3_vite@6.3.5_@types+node@22.15.18_sugarss@4.0.1_postcss@8.5.3__/node_modules/vite-tsconfig-paths
+│   ├── vitest -> .pnpm/vitest@3.1.3_@types+node@22.15.18_jsdom@26.1.0_sugarss@4.0.1_postcss@8.5.3_/node_modules/vitest
+│   └── zod -> .pnpm/zod@3.24.4/node_modules/zod
+├── output.txt
+├── package.json
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+├── postcss.config.cjs
+├── public
+│   ├── locales
+│   │   └── en
+│   │       └── translation.json
+│   └── vite.svg
+├── README.md
+├── scripts
+│   └── generate-types.js
+├── src
+│   ├── App.tsx
+│   ├── assets
+│   │   └── react.svg
+│   ├── components
+│   │   ├── AppHeader
+│   │   │   ├── AppHeader.module.css
+│   │   │   └── AppHeader.tsx
+│   │   └── ColorSchemeToggle
+│   │       └── ColorSchemeToggle.tsx
+│   ├── generated
+│   │   └── schema.d.ts
+│   ├── i18n.ts
+│   ├── main.tsx
+│   ├── pages
+│   │   ├── Home.page.tsx
+│   │   ├── PortfolioDetails.page.tsx
+│   │   ├── PortfolioImport.page.tsx
+│   │   ├── PortfolioImportMapping.page.tsx
+│   │   └── Root.shell.tsx
+│   ├── Router.tsx
+│   ├── theme.ts
+│   ├── utils
+│   │   └── errors.ts
+│   └── vite-env.d.ts
+├── test-utils
+│   ├── index.ts
+│   └── render.tsx
+├── tsconfig.json
+├── vite.config.mjs
+└── vitest.setup.mjs
+
+85 directories, 33 files
