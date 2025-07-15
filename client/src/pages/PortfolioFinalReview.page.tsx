@@ -22,8 +22,6 @@ import {
   IconAlertCircle,
   IconHome,
 } from "@tabler/icons-react";
-// Remove this import if you haven't set up notifications provider
-// import { notifications } from '@mantine/notifications';
 
 // This interface should match the backend Address model structure
 interface Address {
@@ -174,27 +172,12 @@ export function PortfolioFinalReviewPage() {
       // Show success state
       setSubmitSuccess(true);
 
-      // Optional: Use notifications if you have it set up
-      // notifications.show({
-      //   title: 'Success!',
-      //   message: `Portfolio "${portfolioTitle}" created successfully with ${validProperties.length} properties.`,
-      //   color: 'green',
-      //   icon: <IconCheck size={16} />,
-      // });
-
     } catch (error) {
       console.error("Error creating portfolio:", error);
       setSubmitError(
         error instanceof Error ? error.message : "An unexpected error occurred"
       );
 
-      // Optional: Use notifications if you have it set up
-      // notifications.show({
-      //   title: 'Error',
-      //   message: 'Failed to create portfolio. Please try again.',
-      //   color: 'red',
-      //   icon: <IconAlertCircle size={16} />,
-      // });
     } finally {
       setIsSubmitting(false);
     }

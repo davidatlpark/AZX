@@ -54,8 +54,8 @@ export function PortfolioReviewPage() {
   const [mappedData, setMappedData] = useState<MappedRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showInvalidOnly, setShowInvalidOnly] = useState<boolean>(false);
-  const [showEditedOnly, setShowEditedOnly] = useState<boolean>(false);
+  const [showInvalidOnly, setShowInvalidOnly] = useState(false);
+  const [showEditedOnly, setShowEditedOnly] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [editModalData, setEditModalData] = useState<EditModalData | null>(
     null
@@ -65,31 +65,27 @@ export function PortfolioReviewPage() {
 
   const { file, columnMappings } = location.state || {};
 
-  // Optimized CSV parsing with better error handling
+  // Simple CSV parsing
   const parseCSVLine = (line: string): string[] => {
     const result: string[] = [];
     let current = "";
     let inQuotes = false;
-    let i = 0;
 
-    while (i < line.length) {
+    for (let i = 0; i < line.length; i++) {
       const char = line[i];
 
       if (char === '"') {
         if (inQuotes && line[i + 1] === '"') {
           current += '"';
-          i += 2;
+          i++;
         } else {
           inQuotes = !inQuotes;
-          i++;
         }
       } else if (char === "," && !inQuotes) {
         result.push(current.trim());
         current = "";
-        i++;
       } else {
         current += char;
-        i++;
       }
     }
 
@@ -97,156 +93,33 @@ export function PortfolioReviewPage() {
     return result;
   };
 
-  // Check if a row has any meaningful data
-  const isRowEmpty = (values: string[]): boolean => {
-    return values.every((value) => !value || value.trim() === "");
-  };
+  // Check if row has meaningful data
+  const isRowMeaningful = (values: string[]): boolean => {
+    if (values.every((value) => !value || value.trim() === "")) return false;
 
-  // Check if a row has sufficient data to be meaningful
-  const isRowMeaningful = (values: string[], headers: string[]): boolean => {
-    if (isRowEmpty(values)) return false;
-
-    // Count non-empty values
-    const nonEmptyCount = values.filter(
-      (value) => value && value.trim() !== ""
-    ).length;
-
-    // Row is meaningful if it has at least 2 non-empty values or 1 non-empty value that's substantial
-    if (nonEmptyCount >= 2) return true;
-    if (nonEmptyCount === 1) {
-      const nonEmptyValue = values.find(
-        (value) => value && value.trim() !== ""
-      );
-      return nonEmptyValue ? nonEmptyValue.trim().length > 2 : false;
+    const nonEmptyValues = values.filter((v) => v && v.trim() !== "");
+    // Row is meaningful if it has at least 2 non-empty values or 1 substantial value
+    if (nonEmptyValues.length >= 2) return true;
+    if (nonEmptyValues.length === 1) {
+      return nonEmptyValues[0].trim().length > 2;
     }
-
     return false;
   };
 
-  const parseAndMapData = async () => {
-    if (!file || !columnMappings) {
-      setError("Missing file or column mappings");
-      setLoading(false);
-      return;
-    }
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      const text = await file.text();
-      const lines = text
-        .split("\n")
-        .map((line: string) => line.trim())
-        .filter((line: string) => line.length > 0); // Filter out completely empty lines
-
-      if (lines.length <= 1) {
-        setError("CSV file appears to be empty or contains only headers");
-        setLoading(false);
-        return;
-      }
-
-      const headers = parseCSVLine(lines[0]);
-      const dataLines = lines.slice(1);
-
-      console.log(`Found ${dataLines.length} potential data rows...`);
-
-      // Filter out empty or meaningless rows
-      const meaningfulDataLines = dataLines.filter((line: string) => {
-        const values = parseCSVLine(line);
-        return isRowMeaningful(values, headers);
-      });
-
-      console.log(
-        `Processing ${meaningfulDataLines.length} meaningful rows (filtered out ${dataLines.length - meaningfulDataLines.length} empty rows)...`
-      );
-
-      if (meaningfulDataLines.length === 0) {
-        setError("No meaningful data found in CSV file");
-        setLoading(false);
-        return;
-      }
-
-      // Validate that we have mappings for the headers
-      const hasValidMappings = headers.some(
-        (header) =>
-          columnMappings[header] && columnMappings[header] !== "ignored"
-      );
-
-      if (!hasValidMappings) {
-        setError(
-          "No valid column mappings found. Please go back and map your columns."
-        );
-        setLoading(false);
-        return;
-      }
-
-      // Process meaningful data in batches
-      const batchSize = 100;
-      const mapped: MappedRow[] = [];
-
-      for (let i = 0; i < meaningfulDataLines.length; i += batchSize) {
-        const batch = meaningfulDataLines.slice(i, i + batchSize);
-
-        const batchMapped = batch.map((row: string, batchIndex: number) => {
-          const values = parseCSVLine(row);
-          const mappedRow: MappedRow = {
-            _originalIndex: i + batchIndex,
-            _isEdited: false,
-            _isValid: true,
-            _errors: [],
-          };
-
-          // Apply column mappings
-          headers.forEach((header, headerIndex) => {
-            const mapping = columnMappings[header];
-            if (mapping && mapping !== "ignored") {
-              const value = values[headerIndex] || "";
-              mappedRow[mapping] = value.trim();
-            }
-          });
-
-          // Validate the row
-          const validation = validateRow(mappedRow);
-          mappedRow._isValid = validation.isValid;
-          mappedRow._errors = validation.errors;
-
-          return mappedRow;
-        });
-
-        mapped.push(...batchMapped);
-
-        // Allow UI to update between batches
-        if (i + batchSize < meaningfulDataLines.length) {
-          await new Promise((resolve) => setTimeout(resolve, 0));
-        }
-      }
-
-      console.log(`Successfully processed ${mapped.length} meaningful rows`);
-      setMappedData(mapped);
-      setLoading(false);
-    } catch (err) {
-      console.error("Error processing CSV:", err);
-      setError("Failed to parse CSV file. Please check the file format.");
-      setLoading(false);
-    }
-  };
-
+  // Validate a single row
   const validateRow = (
     row: MappedRow
   ): { isValid: boolean; errors: string[] } => {
     const errors: string[] = [];
-
-    // Helper function to get string value
-    const getStringValue = (key: string): string => {
+    const getValue = (key: string): string => {
       const value = row[key];
       return typeof value === "string" ? value.trim() : "";
     };
 
-    // Check if row has any meaningful data at all
+    // Check for meaningful data
     const mappedValues = Object.keys(row)
       .filter((key) => !key.startsWith("_"))
-      .map((key) => getStringValue(key))
+      .map((key) => getValue(key))
       .filter((val) => val.length > 0);
 
     if (mappedValues.length === 0) {
@@ -256,18 +129,17 @@ export function PortfolioReviewPage() {
 
     // Check required field combinations for geocoding
     const hasFormattedAddress =
-      getStringValue("formatted_address") &&
-      (getStringValue("country") || getStringValue("country_code"));
+      getValue("formatted_address") &&
+      (getValue("country") || getValue("country_code"));
     const hasAddressLine =
-      getStringValue("address_line") &&
-      getStringValue("city") &&
-      (getStringValue("country") || getStringValue("country_code"));
+      getValue("address_line") &&
+      getValue("city") &&
+      (getValue("country") || getValue("country_code"));
     const hasBuildingAddress =
-      (getStringValue("house_number") || getStringValue("name")) &&
-      getStringValue("city") &&
-      (getStringValue("country") || getStringValue("country_code"));
-    const hasCoordinates =
-      getStringValue("latitude") && getStringValue("longitude");
+      (getValue("house_number") || getValue("name")) &&
+      getValue("city") &&
+      (getValue("country") || getValue("country_code"));
+    const hasCoordinates = getValue("latitude") && getValue("longitude");
 
     if (
       !hasFormattedAddress &&
@@ -278,9 +150,9 @@ export function PortfolioReviewPage() {
       errors.push("Missing required address information for geocoding");
     }
 
-    // Validate coordinates if present
-    const latitude = getStringValue("latitude");
-    const longitude = getStringValue("longitude");
+    // Validate coordinates
+    const latitude = getValue("latitude");
+    const longitude = getValue("longitude");
 
     if (latitude) {
       const latNum = parseFloat(latitude);
@@ -296,88 +168,158 @@ export function PortfolioReviewPage() {
       }
     }
 
-    // Validate postal code format (basic check)
-    const postalCode = getStringValue("postal_code");
+    // Validate other fields
+    const postalCode = getValue("postal_code");
     if (postalCode && postalCode.length > 20) {
       errors.push("Postal code is too long");
     }
 
-    // Validate country code format
-    const countryCode = getStringValue("country_code");
+    const countryCode = getValue("country_code");
     if (countryCode && countryCode.length !== 2) {
       errors.push("Country code must be 2 characters");
     }
 
-    // Validate state code format
-    const stateCode = getStringValue("state_code");
+    const stateCode = getValue("state_code");
     if (stateCode && stateCode.length > 3) {
       errors.push("State code is too long");
     }
 
-    return {
-      isValid: errors.length === 0,
-      errors,
-    };
+    return { isValid: errors.length === 0, errors };
   };
 
-  // Memoized filtered data for better performance
+  // Process CSV data
+  const parseAndMapData = async () => {
+    if (!file || !columnMappings) {
+      setError("Missing file or column mappings");
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const text = await file.text();
+      const lines: string[] = text
+        .split("\n")
+        .map((line: string) => line.trim())
+        .filter((line: string) => line.length > 0);
+
+      if (lines.length <= 1) {
+        setError("CSV file appears to be empty or contains only headers");
+        setLoading(false);
+        return;
+      }
+
+      const headers = parseCSVLine(lines[0]);
+      const dataLines = lines.slice(1);
+
+      // Filter meaningful rows
+      const meaningfulRows = dataLines.filter((line) => {
+        const values = parseCSVLine(line);
+        return isRowMeaningful(values);
+      });
+
+      if (meaningfulRows.length === 0) {
+        setError("No meaningful data found in CSV file");
+        setLoading(false);
+        return;
+      }
+
+      // Check for valid mappings
+      const hasValidMappings = headers.some(
+        (header) =>
+          columnMappings[header] && columnMappings[header] !== "ignored"
+      );
+
+      if (!hasValidMappings) {
+        setError(
+          "No valid column mappings found. Please go back and map your columns."
+        );
+        setLoading(false);
+        return;
+      }
+
+      // Map data
+      const mapped: MappedRow[] = meaningfulRows.map((row, index) => {
+        const values = parseCSVLine(row);
+        const mappedRow: MappedRow = {
+          _originalIndex: index,
+          _isEdited: false,
+          _isValid: true,
+          _errors: [],
+        };
+
+        // Apply column mappings
+        headers.forEach((header, headerIndex) => {
+          const mapping = columnMappings[header];
+          if (mapping && mapping !== "ignored") {
+            mappedRow[mapping] = (values[headerIndex] || "").trim();
+          }
+        });
+
+        // Validate row
+        const validation = validateRow(mappedRow);
+        mappedRow._isValid = validation.isValid;
+        mappedRow._errors = validation.errors;
+
+        return mappedRow;
+      });
+
+      setMappedData(mapped);
+      setLoading(false);
+    } catch (err) {
+      console.error("Error processing CSV:", err);
+      setError("Failed to parse CSV file. Please check the file format.");
+      setLoading(false);
+    }
+  };
+
+  // Memoized calculations
   const filteredData = useMemo(() => {
     let filtered = mappedData;
-
-    if (showInvalidOnly) {
-      filtered = filtered.filter((row) => !row._isValid);
-    }
-
-    if (showEditedOnly) {
-      filtered = filtered.filter((row) => row._isEdited);
-    }
-
+    if (showInvalidOnly) filtered = filtered.filter((row) => !row._isValid);
+    if (showEditedOnly) filtered = filtered.filter((row) => row._isEdited);
     return filtered;
   }, [mappedData, showInvalidOnly, showEditedOnly]);
 
-  // Memoized pagination
   const paginatedData = useMemo(() => {
-    const startIndex = (currentPage - 1) * ROWS_PER_PAGE;
-    const endIndex = startIndex + ROWS_PER_PAGE;
-    return filteredData.slice(startIndex, endIndex);
+    const start = (currentPage - 1) * ROWS_PER_PAGE;
+    return filteredData.slice(start, start + ROWS_PER_PAGE);
   }, [filteredData, currentPage]);
 
-  // Memoized stats
-  const stats = useMemo(() => {
-    const validCount = mappedData.filter((row) => row._isValid).length;
-    const invalidCount = mappedData.filter((row) => !row._isValid).length;
-    const editedCount = mappedData.filter((row) => row._isEdited).length;
+  const stats = useMemo(
+    () => ({
+      validCount: mappedData.filter((row) => row._isValid).length,
+      invalidCount: mappedData.filter((row) => !row._isValid).length,
+      editedCount: mappedData.filter((row) => row._isEdited).length,
+    }),
+    [mappedData]
+  );
 
-    return { validCount, invalidCount, editedCount };
-  }, [mappedData]);
-
-  // Memoized mapped fields
-  const mappedFields = useMemo(() => {
-    return Object.values(columnMappings).filter(
-      (v) => v !== "ignored"
-    ) as string[];
-  }, [columnMappings]);
+  const mappedFields = useMemo(
+    () =>
+      Object.values(columnMappings).filter((v) => v !== "ignored") as string[],
+    [columnMappings]
+  );
 
   useEffect(() => {
     if (!file || !columnMappings) {
       if (!file) {
-        console.error("No file found in navigation state");
         navigate("/portfolio/import");
       } else if (!columnMappings) {
-        console.error("No column mappings found in navigation state");
         navigate("/portfolio/import/mapping", { state: { file } });
       }
       return;
     }
-
     parseAndMapData();
   }, [file, columnMappings, navigate]);
 
   useEffect(() => {
-    // Reset to first page when filters change
     setCurrentPage(1);
   }, [showInvalidOnly, showEditedOnly]);
 
+  // Event handlers
   const handleEditClick = (rowIndex: number, field: string, value: string) => {
     setEditModalData({
       rowIndex,
@@ -389,41 +331,31 @@ export function PortfolioReviewPage() {
   };
 
   const handleEditSave = (newValue: string) => {
-    if (editModalData) {
-      const updatedData = [...mappedData];
-      const row = updatedData[editModalData.rowIndex];
+    if (!editModalData) return;
 
-      // Update the value
-      row[editModalData.field] = newValue;
-      row._isEdited = true;
+    const updatedData = [...mappedData];
+    const row = updatedData[editModalData.rowIndex];
 
-      // Re-validate the row
-      const validation = validateRow(row);
-      row._isValid = validation.isValid;
-      row._errors = validation.errors;
+    row[editModalData.field] = newValue;
+    row._isEdited = true;
 
-      setMappedData(updatedData);
-    }
+    const validation = validateRow(row);
+    row._isValid = validation.isValid;
+    row._errors = validation.errors;
+
+    setMappedData(updatedData);
     closeEditModal();
   };
 
   const handleNext = () => {
     navigate("/portfolio/import/details", {
-      state: {
-        file,
-        columnMappings,
-        mappedData,
-        step: 4,
-      },
+      state: { file, columnMappings, mappedData, step: 4 },
     });
   };
 
   const handleBack = () => {
     navigate("/portfolio/import/mapping", {
-      state: {
-        file,
-        columnMappings,
-      },
+      state: { file, columnMappings },
     });
   };
 
@@ -432,16 +364,10 @@ export function PortfolioReviewPage() {
     return typeof value === "string" ? value : String(value || "");
   };
 
-  const isFieldEditable = (field: string): boolean => {
-    return !["_originalIndex", "_isEdited", "_isValid", "_errors"].includes(
-      field
-    );
-  };
+  const isFieldEditable = (field: string): boolean =>
+    !["_originalIndex", "_isEdited", "_isValid", "_errors"].includes(field);
 
-  if (!file || !columnMappings) {
-    return null;
-  }
-
+  // Render loading state
   if (loading) {
     return (
       <Container size="md" py="xl">
@@ -458,6 +384,7 @@ export function PortfolioReviewPage() {
     );
   }
 
+  // Render error state
   if (error) {
     return (
       <Container size="md" py="xl">
@@ -472,6 +399,8 @@ export function PortfolioReviewPage() {
       </Container>
     );
   }
+
+  if (!file || !columnMappings) return null;
 
   const { validCount, invalidCount, editedCount } = stats;
   const totalPages = Math.ceil(filteredData.length / ROWS_PER_PAGE);
@@ -514,16 +443,12 @@ export function PortfolioReviewPage() {
               <Switch
                 label="Show invalid rows only"
                 checked={showInvalidOnly}
-                onChange={(event) =>
-                  setShowInvalidOnly(event.currentTarget.checked)
-                }
+                onChange={(e) => setShowInvalidOnly(e.currentTarget.checked)}
               />
               <Switch
                 label="Show edited rows only"
                 checked={showEditedOnly}
-                onChange={(event) =>
-                  setShowEditedOnly(event.currentTarget.checked)
-                }
+                onChange={(e) => setShowEditedOnly(e.currentTarget.checked)}
               />
             </Group>
 
@@ -549,15 +474,12 @@ export function PortfolioReviewPage() {
                       <Table.Td>{(row._originalIndex as number) + 1}</Table.Td>
                       <Table.Td>
                         <Group gap="xs">
-                          {row._isValid ? (
-                            <Badge color="green" variant="light">
-                              Valid
-                            </Badge>
-                          ) : (
-                            <Badge color="red" variant="light">
-                              Invalid
-                            </Badge>
-                          )}
+                          <Badge
+                            color={row._isValid ? "green" : "red"}
+                            variant="light"
+                          >
+                            {row._isValid ? "Valid" : "Invalid"}
+                          </Badge>
                           {row._isEdited && (
                             <Badge color="blue" variant="light">
                               Edited
@@ -613,17 +535,15 @@ export function PortfolioReviewPage() {
                         </Table.Td>
                       ))}
                       <Table.Td>
-                        <Group gap="xs">
+                        <Tooltip
+                          label={row._isValid ? "Valid row" : "Invalid row"}
+                        >
                           {row._isValid ? (
-                            <Tooltip label="Valid row">
-                              <IconCheck size={16} color="green" />
-                            </Tooltip>
+                            <IconCheck size={16} color="green" />
                           ) : (
-                            <Tooltip label="Invalid row">
-                              <IconX size={16} color="red" />
-                            </Tooltip>
+                            <IconX size={16} color="red" />
                           )}
-                        </Group>
+                        </Tooltip>
                       </Table.Td>
                     </Table.Tr>
                   ))}
@@ -631,7 +551,6 @@ export function PortfolioReviewPage() {
               </Table>
             </div>
 
-            {/* Pagination */}
             {totalPages > 1 && (
               <Group justify="center">
                 <Pagination
@@ -714,7 +633,7 @@ export function PortfolioReviewPage() {
   );
 }
 
-// Separate component for the edit modal content
+// Edit modal component
 function EditFieldModal({
   data,
   onSave,
@@ -725,10 +644,6 @@ function EditFieldModal({
   onCancel: () => void;
 }) {
   const [value, setValue] = useState(data.value);
-
-  const handleSave = () => {
-    onSave(value);
-  };
 
   const isNumericField =
     data.field === "latitude" || data.field === "longitude";
@@ -752,7 +667,7 @@ function EditFieldModal({
         <TextInput
           label={data.label}
           value={value}
-          onChange={(event) => setValue(event.currentTarget.value)}
+          onChange={(e) => setValue(e.currentTarget.value)}
           placeholder={`Enter ${data.label.toLowerCase()}`}
         />
       )}
@@ -761,7 +676,7 @@ function EditFieldModal({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={handleSave}>Save</Button>
+        <Button onClick={() => onSave(value)}>Save</Button>
       </Group>
     </Stack>
   );
